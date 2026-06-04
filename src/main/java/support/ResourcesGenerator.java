@@ -58,15 +58,15 @@ public class ResourcesGenerator extends Thread {
                 //perishable
                 generateFood(0);
                 //non-perishable
-                //generateFood(1);
+                generateFood(1);
                 ///generate jewels
-                //for (int jewelType = 0; jewelType < 6; jewelType++) {
-                //    generateJewel(jewelType);
-                //}
+                for (int jewelType = 0; jewelType < 6; jewelType++) {
+                   generateJewel(jewelType);
+                }
 
                 //System.out.println("..............ResourcesGenerator SLEEPING........");
-                //Thread.sleep(timeInMinutes * 60000);
-                Thread.sleep(timeInMinutes * 1000);
+                Thread.sleep(timeInMinutes * 60000);
+                // Thread.sleep(timeInMinutes * 1000);
 
             } catch (Exception ex) {
                 ex.printStackTrace();

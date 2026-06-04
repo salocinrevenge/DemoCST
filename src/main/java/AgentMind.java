@@ -27,7 +27,9 @@ import codelets.behaviors.GoToClosestApple;
 import codelets.motor.HandsActionCodelet;
 import codelets.motor.LegsActionCodelet;
 import codelets.perception.AppleDetector;
+import codelets.perception.JewelDetector;
 import codelets.perception.ClosestAppleDetector;
+import codelets.perception.ClosestJewelDetector;
 import codelets.sensors.InnerSense;
 import codelets.sensors.Vision;
 import java.awt.Polygon;
@@ -63,7 +65,9 @@ public class AgentMind extends Mind {
                 Memory visionMO;
                 Memory innerSenseMO;
                 Memory closestAppleMO;
+                Memory closestJewelMO;
                 Memory knownApplesMO;
+                Memory knownJewelsMO;
                 
                 //Initialize Memory Objects
                 legsMO=createMemoryContainer("LEGS");
@@ -94,11 +98,17 @@ public class AgentMind extends Mind {
                 innerSenseMO=createMemoryObject("INNER", cis);
                 registerMemory(innerSenseMO,"Sensory");
                 Thing closestApple = null;
+                Thing closestJewel = null;
                 closestAppleMO=createMemoryObject("CLOSEST_APPLE", closestApple);
+                closestJewelMO=createMemoryObject("CLOSEST_JEWEL", closestJewel);
                 registerMemory(closestAppleMO,"Working");
+                registerMemory(closestJewelMO,"Working");
                 List<Thing> knownApples = Collections.synchronizedList(new ArrayList<Thing>());
+                List<Thing> knownJewels = Collections.synchronizedList(new ArrayList<Thing>());
                 knownApplesMO=createMemoryObject("KNOWN_APPLES", knownApples);
+                knownJewelsMO=createMemoryObject("KNOWN_JEWELS", knownJewels);
                 registerMemory(knownApplesMO,"Working");
+                registerMemory(knownJewelsMO,"Working");
                 
  		// Create Sensor Codelets	
 		Codelet vision=new Vision(env.c);
@@ -128,6 +138,14 @@ public class AgentMind extends Mind {
                 ad.addOutput(knownApplesMO);
                 insertCodelet(ad);
                 registerCodelet(ad,"Perception");
+
+                Codelet jd = new JewelDetector();
+                jd.addInput(visionMO);
+                jd.addOutput(knownJewelsMO);
+                insertCodelet(jd);
+                registerCodelet(jd,"Perception");
+
+
                 
 		Codelet closestAppleDetector = new ClosestAppleDetector();
 		closestAppleDetector.addInput(knownApplesMO);
@@ -135,7 +153,14 @@ public class AgentMind extends Mind {
 		closestAppleDetector.addOutput(closestAppleMO);
                 insertCodelet(closestAppleDetector);
                 registerCodelet(closestAppleDetector,"Perception");
-		
+                
+		Codelet closestJewelDetector = new ClosestJewelDetector();
+		closestJewelDetector.addInput(knownJewelsMO);
+		closestJewelDetector.addInput(innerSenseMO);
+		closestJewelDetector.addOutput(closestJewelMO);
+                insertCodelet(closestJewelDetector);
+                registerCodelet(closestJewelDetector,"Perception");
+
 		// Create Behavior Codelets
 		Codelet goToClosestApple = new GoToClosestApple(creatureBasicSpeed,reachDistance);
 		goToClosestApple.addInput(closestAppleMO);

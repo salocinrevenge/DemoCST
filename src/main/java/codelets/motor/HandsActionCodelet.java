@@ -53,11 +53,11 @@ public class HandsActionCodelet extends Codelet{
 	
         @Override
 	public void accessMemoryObjects() {
-		handsMO=(MemoryObject)this.getInput("HANDS");
+		handsMO=(MemoryObject)this.getInput("HANDS"); // Obtem o memory object de entrada "HANDS"
 	}
 	public void proc() {
             
-                String command = (String) handsMO.getI();
+                String command = (String) handsMO.getI(); // Lê o comando atual do memory object "HANDS"
 
 		if(!command.equals("") && (!command.equals(previousHandsAction))){
 			JSONObject jsonAction;
