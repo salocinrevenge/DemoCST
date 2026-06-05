@@ -56,6 +56,7 @@ public class InnerSense extends Codelet {
              cis.get("position.y").setValue(c.getPosition().getY());
              cis.get("pitch").setValue(c.getPitch());
              cis.get("fuel").setValue(c.getFuel());
+             cis.get("goodFuel").setValue(800.0);
              Polygon pol = c.getFOV();
              Idea poli = cis.get("FOV");
              poli.get("bounds.x").setValue(pol.getBounds().getX());

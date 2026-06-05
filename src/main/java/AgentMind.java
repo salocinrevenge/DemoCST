@@ -22,8 +22,10 @@ import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.Mind;
 import br.unicamp.cst.representation.idea.Idea;
 import codelets.behaviors.EatClosestApple;
+import codelets.behaviors.GetClosestJewel;
 import codelets.behaviors.Forage;
 import codelets.behaviors.GoToClosestApple;
+import codelets.behaviors.GoToClosestJewel;
 import codelets.motor.HandsActionCodelet;
 import codelets.motor.LegsActionCodelet;
 import codelets.perception.AppleDetector;
@@ -81,6 +83,7 @@ public class AgentMind extends Mind {
                 Idea cis = Idea.createIdea("cis","", Idea.guessType("AbstractObject",null,1.0,0.5));
                 cis.add(Idea.createIdea("cis.pitch", 0D, Idea.guessType("Property", null,1.0,0.5)));
                 cis.add(Idea.createIdea("cis.fuel", 0D, Idea.guessType("Property", null,1.0,0.5)));
+                cis.add(Idea.createIdea("cis.goodFuel", 0D, Idea.guessType("Property", null,1.0,0.5)));
                 Idea position = Idea.createIdea("cis.position","", Idea.guessType("Property",null,1.0,0.5));
                 position.add(Idea.createIdea("cis.position.x",0D,Idea.guessType("QualityDimension",null,1.0,0.5)));
                 position.add(Idea.createIdea("cis.position.y",0D,Idea.guessType("QualityDimension",null,1.0,0.5)));
@@ -168,8 +171,15 @@ public class AgentMind extends Mind {
 		goToClosestApple.addOutput(legsMO);
                 insertCodelet(goToClosestApple);
                 registerCodelet(goToClosestApple,"Behavioral");
-                
                 behavioralCodelets.add(goToClosestApple);
+
+		Codelet goToClosestJewel = new GoToClosestJewel(creatureBasicSpeed,reachDistance);
+		goToClosestJewel.addInput(closestJewelMO);
+		goToClosestJewel.addInput(innerSenseMO);
+		goToClosestJewel.addOutput(legsMO);
+                insertCodelet(goToClosestJewel);
+                registerCodelet(goToClosestJewel,"Behavioral");
+                behavioralCodelets.add(goToClosestJewel);
 		
 		Codelet eatApple=new EatClosestApple(reachDistance);
 		eatApple.addInput(closestAppleMO);
@@ -179,6 +189,15 @@ public class AgentMind extends Mind {
                 insertCodelet(eatApple);
                 registerCodelet(eatApple,"Behavioral");
                 behavioralCodelets.add(eatApple);
+
+		Codelet getJewel=new GetClosestJewel(reachDistance);
+		getJewel.addInput(closestJewelMO);
+		getJewel.addInput(innerSenseMO);
+		getJewel.addOutput(handsMO);
+                getJewel.addOutput(knownJewelsMO);
+                insertCodelet(getJewel);
+                registerCodelet(getJewel,"Behavioral");
+                behavioralCodelets.add(getJewel);
                 
                 Codelet forage=new Forage();
 		forage.addInput(knownApplesMO);

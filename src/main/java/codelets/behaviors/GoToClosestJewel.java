@@ -30,43 +30,43 @@ import br.unicamp.cst.core.entities.MemoryObject;
 import br.unicamp.cst.representation.idea.Idea;
 import ws3dproxy.model.Thing;
 
-public class GoToClosestApple extends Codelet {
+public class GoToClosestJewel extends Codelet {
 
-	private Memory closestAppleMO;
+	private Memory closestJewelMO;
 	private Memory selfInfoMO;
 	private MemoryContainer legsMO;
 	private int creatureBasicSpeed;
 	private double reachDistance;
 
-	public GoToClosestApple(int creatureBasicSpeed, int reachDistance) {
+	public GoToClosestJewel(int creatureBasicSpeed, int reachDistance) {
 		this.creatureBasicSpeed=creatureBasicSpeed;
 		this.reachDistance=reachDistance;
-                this.name = "GoToClosestApple";
+                this.name = "GoToClosestJewel";
 	}
 
 	@Override
 	public void accessMemoryObjects() {
-		closestAppleMO=(MemoryObject)this.getInput("CLOSEST_APPLE");
+		closestJewelMO=(MemoryObject)this.getInput("CLOSEST_JEWEL");
 		selfInfoMO=(MemoryObject)this.getInput("INNER");
 		legsMO=(MemoryContainer)this.getOutput("LEGS");
 	}
 
 	@Override
 	public void proc() {
-		// Find distance between creature and closest apple
+		// Find distance between creature and closest jewel
 		//If far, go towards it
 		//If close, stops
 
-                Thing closestApple = (Thing) closestAppleMO.getI();
+                Thing closestJewel = (Thing) closestJewelMO.getI();
                 Idea cis = (Idea) selfInfoMO.getI();
 
-		if(closestApple != null)
+		if(closestJewel != null)
 		{
-			double appleX=0;
-			double appleY=0;
+			double jewelX=0;
+			double jewelY=0;
 			try {
-                                appleX = closestApple.getCenterPosition().getX();
-                                appleY = closestApple.getCenterPosition().getY();
+                                jewelX = closestJewel.getCenterPosition().getX();
+                                jewelY = closestJewel.getCenterPosition().getY();
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -75,37 +75,37 @@ public class GoToClosestApple extends Codelet {
 			double selfX=(double)cis.get("position.x").getValue();
 			double selfY=(double)cis.get("position.y").getValue();
 
-			double fuel = (double) cis.get("fuel").getValue();
-			double goodFuel = (double) cis.get("goodFuel").getValue();
+			double fuel = (double)cis.get("fuel").getValue();
+			double goodFuel = (double)cis.get("goodFuel").getValue();
 
-			Point2D pApple = new Point();
-			pApple.setLocation(appleX, appleY);
+			Point2D pJewel = new Point();
+			pJewel.setLocation(jewelX, jewelY);
 
 			Point2D pSelf = new Point();
 			pSelf.setLocation(selfX, selfY);
 
-			double distance = pSelf.distance(pApple);
+			double distance = pSelf.distance(pJewel);
 			//JSONObject message=new JSONObject();
                         Idea message = Idea.createIdea("message","", Idea.guessType("Property",null,1.0,0.5));
 			try {
-				if(fuel<goodFuel)
+				if(fuel>=goodFuel)
 				{
 					if(distance>reachDistance){ //Go to it
 											message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
-											message.add(Idea.createIdea("X",(int)appleX, Idea.guessType("Property",null,1.0,0.5)));
-											message.add(Idea.createIdea("Y",(int)appleY, Idea.guessType("Property",null,1.0,0.5)));
+											message.add(Idea.createIdea("X",(int)jewelX, Idea.guessType("Property",null,1.0,0.5)));
+											message.add(Idea.createIdea("Y",(int)jewelY, Idea.guessType("Property",null,1.0,0.5)));
 											message.add(Idea.createIdea("SPEED",creatureBasicSpeed, Idea.guessType("Property",null,1.0,0.5)));
 											activation=1.0;
 	
 					}else{//Stop
 											message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
-											message.add(Idea.createIdea("X",(int)appleX, Idea.guessType("Property",null,1.0,0.5)));
-											message.add(Idea.createIdea("Y",(int)appleY, Idea.guessType("Property",null,1.0,0.5)));
+											message.add(Idea.createIdea("X",(int)jewelX, Idea.guessType("Property",null,1.0,0.5)));
+											message.add(Idea.createIdea("Y",(int)jewelY, Idea.guessType("Property",null,1.0,0.5)));
 											message.add(Idea.createIdea("SPEED",0, Idea.guessType("Property",null,1.0,0.5)));
 											activation=0.5;
 					}
-					legsMO.setI(toJson(message),activation,name);
 
+					legsMO.setI(toJson(message),activation,name);
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
