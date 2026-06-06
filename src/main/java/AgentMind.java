@@ -19,8 +19,10 @@
 
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.Memory;
+import br.unicamp.cst.core.entities.MemoryContainer;
 import br.unicamp.cst.core.entities.Mind;
 import br.unicamp.cst.representation.idea.Idea;
+import br.unicamp.cst.support.CodeletsProfiler.FileFormat;
 import codelets.behaviors.EatClosestApple;
 import codelets.behaviors.DeliverCompletedLeaflet;
 import codelets.behaviors.GetClosestJewel;
@@ -53,6 +55,8 @@ public class AgentMind extends Mind {
     
     private static int creatureBasicSpeed=3;
     private static int reachDistance=70;
+    private static final String PROFILE_PATH = "profile/";
+    private static final String MIND_IDENTIFIER = "DemoCST";
     public ArrayList<Codelet> behavioralCodelets = new ArrayList<Codelet>();
     
     public AgentMind(Environment env) {
@@ -83,6 +87,7 @@ public class AgentMind extends Mind {
                 //Initialize Memory Objects
                 legsMO=createMemoryContainer("LEGS");
                 registerMemory(legsMO,"Motor");
+                initializeLegsCommandSlots((MemoryContainer) legsMO);
 		handsMO=createMemoryObject("HANDS", "");
                 registerMemory(handsMO,"Motor");
                 List<Thing> vision_list = Collections.synchronizedList(new ArrayList<Thing>());
@@ -136,6 +141,7 @@ public class AgentMind extends Mind {
  		// Create Sensor Codelets	
 		Codelet vision=new Vision(env.c);
 		vision.addOutput(visionMO);
+                vision.setProfiling(true);
                 insertCodelet(vision); //Creates a vision sensor
                 registerCodelet(vision,"Sensory");
 		
@@ -153,11 +159,13 @@ public class AgentMind extends Mind {
 		// Create Actuator Codelets
 		Codelet legs=new LegsActionCodelet(env.c);
 		legs.addInput(legsMO);
+                // legs.setPublishSubscribe(true);
                 insertCodelet(legs);
                 registerCodelet(legs,"Motor");
 
 		Codelet hands=new HandsActionCodelet(env.c);
 		hands.addInput(handsMO);
+                // hands.setPublishSubscribe(true);
                 insertCodelet(hands);
                 registerCodelet(hands,"Motor");
 		
@@ -165,12 +173,14 @@ public class AgentMind extends Mind {
                 Codelet ad = new AppleDetector();
                 ad.addInput(visionMO);
                 ad.addOutput(knownApplesMO);
+                // ad.setPublishSubscribe(true);
                 insertCodelet(ad);
                 registerCodelet(ad,"Perception");
 
                 Codelet jd = new JewelDetector();
                 jd.addInput(visionMO);
                 jd.addOutput(knownJewelsMO);
+                // jd.setPublishSubscribe(true);
                 insertCodelet(jd);
                 registerCodelet(jd,"Perception");
 
@@ -180,6 +190,15 @@ public class AgentMind extends Mind {
 		closestAppleDetector.addInput(knownApplesMO);
 		closestAppleDetector.addInput(innerSenseMO);
 		closestAppleDetector.addOutput(closestAppleMO);
+                closestAppleDetector.setProfiling(true);
+                closestAppleDetector.setCodeletProfiler(
+                        PROFILE_PATH,
+                        "closest-apple-detector-trace.json",
+                        MIND_IDENTIFIER,
+                        1,
+                        1000L,
+                        FileFormat.JSON);
+                // closestAppleDetector.setPublishSubscribe(true);
                 insertCodelet(closestAppleDetector);
                 registerCodelet(closestAppleDetector,"Perception");
                 
@@ -188,6 +207,7 @@ public class AgentMind extends Mind {
 		closestJewelDetector.addInput(innerSenseMO);
 		closestJewelDetector.addInput(leafletsMO);
 		closestJewelDetector.addOutput(closestJewelMO);
+                // closestJewelDetector.setPublishSubscribe(true);
                 insertCodelet(closestJewelDetector);
                 registerCodelet(closestJewelDetector,"Perception");
 
@@ -196,6 +216,7 @@ public class AgentMind extends Mind {
 		goToClosestApple.addInput(closestAppleMO);
 		goToClosestApple.addInput(innerSenseMO);
 		goToClosestApple.addOutput(legsMO);
+                // goToClosestApple.setPublishSubscribe(true);
                 insertCodelet(goToClosestApple);
                 registerCodelet(goToClosestApple,"Behavioral");
                 behavioralCodelets.add(goToClosestApple);
@@ -205,6 +226,7 @@ public class AgentMind extends Mind {
 		goToClosestJewel.addInput(innerSenseMO);
 		goToClosestJewel.addInput(leafletsMO);
 		goToClosestJewel.addOutput(legsMO);
+                // goToClosestJewel.setPublishSubscribe(true);
                 insertCodelet(goToClosestJewel);
                 registerCodelet(goToClosestJewel,"Behavioral");
                 behavioralCodelets.add(goToClosestJewel);
@@ -214,6 +236,7 @@ public class AgentMind extends Mind {
 		goToDeliverySpot.addInput(innerSenseMO);
 		goToDeliverySpot.addInput(deliverySpotMO);
 		goToDeliverySpot.addOutput(legsMO);
+                // goToDeliverySpot.setPublishSubscribe(true);
                 insertCodelet(goToDeliverySpot);
                 registerCodelet(goToDeliverySpot,"Behavioral");
                 behavioralCodelets.add(goToDeliverySpot);
@@ -223,6 +246,7 @@ public class AgentMind extends Mind {
 		eatApple.addInput(innerSenseMO);
 		eatApple.addOutput(handsMO);
                 eatApple.addOutput(knownApplesMO);
+                eatApple.setPublishSubscribe(true);
                 insertCodelet(eatApple);
                 registerCodelet(eatApple,"Behavioral");
                 behavioralCodelets.add(eatApple);
@@ -233,6 +257,7 @@ public class AgentMind extends Mind {
 		getJewel.addInput(leafletsMO);
 		getJewel.addOutput(handsMO);
                 getJewel.addOutput(knownJewelsMO);
+                getJewel.setPublishSubscribe(true);
                 insertCodelet(getJewel);
                 registerCodelet(getJewel,"Behavioral");
                 behavioralCodelets.add(getJewel);
@@ -242,6 +267,7 @@ public class AgentMind extends Mind {
 		deliverLeaflet.addInput(innerSenseMO);
 		deliverLeaflet.addInput(deliverySpotMO);
 		deliverLeaflet.addOutput(handsMO);
+                // deliverLeaflet.setPublishSubscribe(true);
                 insertCodelet(deliverLeaflet);
                 registerCodelet(deliverLeaflet,"Behavioral");
                 behavioralCodelets.add(deliverLeaflet);
@@ -252,6 +278,7 @@ public class AgentMind extends Mind {
 		forage.addInput(innerSenseMO);
 		forage.addInput(leafletsMO);
                 forage.addOutput(legsMO);
+                // forage.setPublishSubscribe(true);
                 insertCodelet(forage);
                 registerCodelet(forage,"Behavioral");
                 behavioralCodelets.add(forage);
@@ -263,5 +290,12 @@ public class AgentMind extends Mind {
 		// Start Cognitive Cycle
 		start(); 
     }             
+
+    private void initializeLegsCommandSlots(MemoryContainer legsMO) {
+        legsMO.setI("", 0.0, "GoToClosestApple");
+        legsMO.setI("", 0.0, "GoToClosestJewel");
+        legsMO.setI("", 0.0, "GoToDeliverySpot");
+        legsMO.setI("", 0.0, "Forage");
+    }
     
 }

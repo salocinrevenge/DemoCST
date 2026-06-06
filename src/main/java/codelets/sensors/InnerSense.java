@@ -57,7 +57,7 @@ public class InnerSense extends Codelet {
              cis.get("pitch").setValue(c.getPitch());
              cis.get("fuel").setValue(c.getFuel());
              double goodFuel = 900.0;
-             double badFuel = 800.0;
+             double badFuel = 400.0;
              String stateFuel = cis.get("stateFuel").getValue().toString();
              cis.get("goodFuel").setValue(goodFuel);
              cis.get("badFuel").setValue(badFuel);
