@@ -103,7 +103,7 @@ public class EatClosestApple extends Codelet {
                                         DestroyClosestApple();
 				}else{
 					System.out.println("Too far to eat the apple: distance="+distance + " reachDistance="+reachDistance);
-					handsMO.setI("");	//nothing
+					// handsMO.setI("");	//nothing
                                         activation=0.0;
 				}
 				
@@ -113,7 +113,7 @@ public class EatClosestApple extends Codelet {
 				e.printStackTrace();
 			}
 		}else{
-			handsMO.setI("");	//nothing
+			// handsMO.setI("");	//nothing
                         activation=0.0;
 		}
         //System.out.println("Before: "+known.size()+ " "+known);

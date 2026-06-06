@@ -31,12 +31,15 @@ import br.unicamp.cst.core.entities.MemoryObject;
 import br.unicamp.cst.representation.idea.Idea;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import support.LeafletUtils;
+import ws3dproxy.model.Leaflet;
 import ws3dproxy.model.Thing;
 
 public class GetClosestJewel extends Codelet {
 
 	private Memory closestJewelMO;
 	private Memory innerSenseMO;
+        private Memory leafletsMO;
         private Memory knownMO;
 	private int reachDistance;
 	private Memory handsMO;
@@ -54,6 +57,7 @@ public class GetClosestJewel extends Codelet {
 	public void accessMemoryObjects() {
 		closestJewelMO=(MemoryObject)this.getInput("CLOSEST_JEWEL");
 		innerSenseMO=(MemoryObject)this.getInput("INNER");
+		leafletsMO=(MemoryObject)this.getInput("LEAFLETS");
 		handsMO=(MemoryObject)this.getOutput("HANDS");
                 knownMO = (MemoryObject)this.getOutput("KNOWN_JEWELS");
 	}
@@ -63,11 +67,12 @@ public class GetClosestJewel extends Codelet {
                 String jewelName="";
                 closestJewel = (Thing) closestJewelMO.getI();
                 cis = (Idea) innerSenseMO.getI();
+                List<Leaflet> leaflets = (List<Leaflet>) leafletsMO.getI();
                 known = (List<Thing>) knownMO.getI();
 		//Find distance between closest jewel and self
 		//If closer than reachDistance, get the jewel
 		
-		if(closestJewel != null)
+		if(closestJewel != null && !LeafletUtils.hasCompletedLeaflet(leaflets))
 		{
 			double jewelX=0;
 			double jewelY=0;
@@ -99,8 +104,9 @@ public class GetClosestJewel extends Codelet {
 					message.put("OBJECT", jewelName);
 					message.put("ACTION", "PICKUP");
 					handsMO.setI(message.toString());
-                                        activation=1.0;
-                                        DestroyClosestJewel();
+					activation=1.0;
+					DestroyClosestJewel();
+					System.out.println("I sent the comand pickup to get the jewel: "+message.toString());
 				}else{
 					System.out.println("Too far to get the jewel: distance="+distance + " reachDistance="+reachDistance);
 					handsMO.setI("");	//nothing
@@ -113,7 +119,7 @@ public class GetClosestJewel extends Codelet {
 				e.printStackTrace();
 			}
 		}else{
-			handsMO.setI("");	//nothing
+			// handsMO.setI("");	//nothing
                         activation=0.0;
 		}
         //System.out.println("Before: "+known.size()+ " "+known);

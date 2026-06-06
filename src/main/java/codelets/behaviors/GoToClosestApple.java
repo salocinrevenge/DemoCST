@@ -109,7 +109,7 @@ public class GoToClosestApple extends Codelet {
 		}
                 else {
                     activation=0.0;
-                    legsMO.setI("",activation,name);
+                    // legsMO.setI("",activation,name);
                 }
                 
 	}//end proc

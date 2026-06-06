@@ -56,22 +56,33 @@ public class HandsActionCodelet extends Codelet{
 		handsMO=(MemoryObject)this.getInput("HANDS"); // Obtem o memory object de entrada "HANDS"
 	}
 	public void proc() {
+		System.out.println("Sanityyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
             
                 String command = (String) handsMO.getI(); // Lê o comando atual do memory object "HANDS"
+		System.out.println("Received command: "+command);
 
 		if(!command.equals("") && (!command.equals(previousHandsAction))){
 			JSONObject jsonAction;
 			try {
 				jsonAction = new JSONObject(command);
+				System.out.println("Processing hands action: "+command);
 				if(jsonAction.has("ACTION") && jsonAction.has("OBJECT")){
 					String action=jsonAction.getString("ACTION");
 					String objectName=jsonAction.getString("OBJECT");
+					System.out.println("Action: "+action+" Object: "+objectName);
 					if(action.equals("PICKUP")){
+												System.out.println("Trying to pick up the object: "+objectName);
+												// Tenta 5 vezes
+												for(int i=0; i<5; i++){
                                                 try {
-                                                 c.putInSack(objectName);
-                                                } catch (Exception e) {
-                                                    
-                                                } 
+													c.putInSack(objectName);
+													c.updateState();
+													c.updateBag();
+													break; // Se conseguir, sai do loop
+													} catch (Exception e) {
+														
+													} 
+												}
 						log.info("Sending Put In Sack command to agent:****** "+objectName+"**********");							
 						
 						
@@ -80,6 +91,7 @@ public class HandsActionCodelet extends Codelet{
 					if(action.equals("EATIT")){
                                                 try {
                                                  c.eatIt(objectName);
+												 System.out.println("I sent the comand eatit to Eating the object: "+objectName);
                                                 } catch (Exception e) {
                                                     
                                                 }
@@ -92,6 +104,23 @@ public class HandsActionCodelet extends Codelet{
                                                     
                                                 }
 						log.info("Sending Bury command to agent:****** "+objectName+"**********");							
+					}
+				}
+                                if(jsonAction.has("ACTION") && jsonAction.has("LEAFLET_ID")){
+					String action=jsonAction.getString("ACTION");
+					String leafletId=jsonAction.getString("LEAFLET_ID");
+					if(action.equals("DELIVER")){
+						System.out.println("Trying to deliver the leaflet: "+leafletId);
+                                                try {
+                                                 c.deliverLeaflet(leafletId);
+                                                 c.genLeaflet();
+                                                 c.updateState();
+                                                 c.updateBag();
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+												System.out.println("Delivering leaflet: "+leafletId);
+						log.info("Sending Deliver Leaflet command to agent:****** "+leafletId+"**********");							
 					}
 				}
 //                                else if (jsonAction.has("ACTION")) {

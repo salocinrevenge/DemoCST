@@ -28,6 +28,8 @@ import br.unicamp.cst.representation.idea.Idea;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import support.LeafletUtils;
+import ws3dproxy.model.Leaflet;
 import ws3dproxy.model.Thing;
 
 /**
@@ -39,6 +41,7 @@ public class ClosestJewelDetector extends Codelet {
 	private Memory knownMO;
 	private Memory closestJewelMO;
 	private Memory innerSenseMO;
+	private Memory leafletsMO;
 	
         private List<Thing> known;
 
@@ -51,12 +54,14 @@ public class ClosestJewelDetector extends Codelet {
 	public void accessMemoryObjects() {
 		this.knownMO=(MemoryObject)this.getInput("KNOWN_JEWELS");
 		this.innerSenseMO=(MemoryObject)this.getInput("INNER");
+		this.leafletsMO=(MemoryObject)this.getInput("LEAFLETS");
 		this.closestJewelMO=(MemoryObject)this.getOutput("CLOSEST_JEWEL");	
 	}
 	@Override
 	public void proc() {
                 Thing closest_jewel=null;
                 known = Collections.synchronizedList((List<Thing>) knownMO.getI());
+                List<Leaflet> leaflets = (List<Leaflet>) leafletsMO.getI();
                 Idea cis = (Idea) innerSenseMO.getI();
                 synchronized(known) {
 		   if(known.size() != 0){
@@ -65,6 +70,10 @@ public class ClosestJewelDetector extends Codelet {
                         for (Thing t : myknown) {
 				String objectName=t.getName();
 				if(objectName.contains("Jewel")){ //Then, it is a jewel
+                                        String jewelColor = LeafletUtils.getJewelColor(t);
+                                        if (!LeafletUtils.needsColor(leaflets, jewelColor)) {
+                                            continue;
+                                        }
                                         if(closest_jewel == null){    
                                                 closest_jewel = t;
 					}
@@ -84,7 +93,7 @@ public class ClosestJewelDetector extends Codelet {
 //                else
 //                   System.out.println("Closest jewel: null"+" known: "+known.size()); 
                 closestJewelMO.setI(closest_jewel);
-				System.out.println("ClosestJewelDetector: closest_jewel="+(closest_jewel!=null?closest_jewel.getName():"null")+" known="+known.size());
+				System.out.println("ClosestJewelDetector: closest_jewel="+(closest_jewel!=null?closest_jewel.getName():"null")+" known="+known.size()+" missing="+LeafletUtils.describeMissing(leaflets));
 	}//end proc
 
 @Override

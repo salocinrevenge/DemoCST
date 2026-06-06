@@ -22,8 +22,10 @@ import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.Mind;
 import br.unicamp.cst.representation.idea.Idea;
 import codelets.behaviors.EatClosestApple;
+import codelets.behaviors.DeliverCompletedLeaflet;
 import codelets.behaviors.GetClosestJewel;
 import codelets.behaviors.Forage;
+import codelets.behaviors.GoToDeliverySpot;
 import codelets.behaviors.GoToClosestApple;
 import codelets.behaviors.GoToClosestJewel;
 import codelets.motor.HandsActionCodelet;
@@ -33,12 +35,16 @@ import codelets.perception.JewelDetector;
 import codelets.perception.ClosestAppleDetector;
 import codelets.perception.ClosestJewelDetector;
 import codelets.sensors.InnerSense;
+import codelets.sensors.LeafletBagSensor;
 import codelets.sensors.Vision;
 import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import ws3dproxy.model.Bag;
+import ws3dproxy.model.Leaflet;
 import ws3dproxy.model.Thing;
+import ws3dproxy.model.WorldPoint;
 /**
  *
  * @author rgudwin
@@ -46,7 +52,7 @@ import ws3dproxy.model.Thing;
 public class AgentMind extends Mind {
     
     private static int creatureBasicSpeed=3;
-    private static int reachDistance=50;
+    private static int reachDistance=70;
     public ArrayList<Codelet> behavioralCodelets = new ArrayList<Codelet>();
     
     public AgentMind(Environment env) {
@@ -70,6 +76,9 @@ public class AgentMind extends Mind {
                 Memory closestJewelMO;
                 Memory knownApplesMO;
                 Memory knownJewelsMO;
+                Memory leafletsMO;
+                Memory bagMO;
+                Memory deliverySpotMO;
                 
                 //Initialize Memory Objects
                 legsMO=createMemoryContainer("LEGS");
@@ -114,6 +123,15 @@ public class AgentMind extends Mind {
                 knownJewelsMO=createMemoryObject("KNOWN_JEWELS", knownJewels);
                 registerMemory(knownApplesMO,"Working");
                 registerMemory(knownJewelsMO,"Working");
+                List<Leaflet> leaflets = Collections.synchronizedList(new ArrayList<Leaflet>());
+                Bag bag = null;
+                WorldPoint deliverySpot = env.deliverySpot;
+                leafletsMO=createMemoryObject("LEAFLETS", leaflets);
+                bagMO=createMemoryObject("BAG", bag);
+                deliverySpotMO=createMemoryObject("DELIVERY_SPOT", deliverySpot);
+                registerMemory(leafletsMO,"Sensory");
+                registerMemory(bagMO,"Sensory");
+                registerMemory(deliverySpotMO,"Working");
                 
  		// Create Sensor Codelets	
 		Codelet vision=new Vision(env.c);
@@ -125,6 +143,12 @@ public class AgentMind extends Mind {
 		innerSense.addOutput(innerSenseMO);
                 insertCodelet(innerSense); //A sensor for the inner state of the creature
                 registerCodelet(innerSense,"Sensory");
+
+		Codelet leafletBagSensor=new LeafletBagSensor(env.c);
+		leafletBagSensor.addOutput(leafletsMO);
+		leafletBagSensor.addOutput(bagMO);
+                insertCodelet(leafletBagSensor);
+                registerCodelet(leafletBagSensor,"Sensory");
 		
 		// Create Actuator Codelets
 		Codelet legs=new LegsActionCodelet(env.c);
@@ -162,6 +186,7 @@ public class AgentMind extends Mind {
 		Codelet closestJewelDetector = new ClosestJewelDetector();
 		closestJewelDetector.addInput(knownJewelsMO);
 		closestJewelDetector.addInput(innerSenseMO);
+		closestJewelDetector.addInput(leafletsMO);
 		closestJewelDetector.addOutput(closestJewelMO);
                 insertCodelet(closestJewelDetector);
                 registerCodelet(closestJewelDetector,"Perception");
@@ -178,10 +203,20 @@ public class AgentMind extends Mind {
 		Codelet goToClosestJewel = new GoToClosestJewel(creatureBasicSpeed,reachDistance);
 		goToClosestJewel.addInput(closestJewelMO);
 		goToClosestJewel.addInput(innerSenseMO);
+		goToClosestJewel.addInput(leafletsMO);
 		goToClosestJewel.addOutput(legsMO);
                 insertCodelet(goToClosestJewel);
                 registerCodelet(goToClosestJewel,"Behavioral");
                 behavioralCodelets.add(goToClosestJewel);
+
+		Codelet goToDeliverySpot = new GoToDeliverySpot(creatureBasicSpeed,reachDistance);
+		goToDeliverySpot.addInput(leafletsMO);
+		goToDeliverySpot.addInput(innerSenseMO);
+		goToDeliverySpot.addInput(deliverySpotMO);
+		goToDeliverySpot.addOutput(legsMO);
+                insertCodelet(goToDeliverySpot);
+                registerCodelet(goToDeliverySpot,"Behavioral");
+                behavioralCodelets.add(goToDeliverySpot);
 		
 		Codelet eatApple=new EatClosestApple(reachDistance);
 		eatApple.addInput(closestAppleMO);
@@ -195,16 +230,27 @@ public class AgentMind extends Mind {
 		Codelet getJewel=new GetClosestJewel(reachDistance);
 		getJewel.addInput(closestJewelMO);
 		getJewel.addInput(innerSenseMO);
+		getJewel.addInput(leafletsMO);
 		getJewel.addOutput(handsMO);
                 getJewel.addOutput(knownJewelsMO);
                 insertCodelet(getJewel);
                 registerCodelet(getJewel,"Behavioral");
                 behavioralCodelets.add(getJewel);
+
+		Codelet deliverLeaflet=new DeliverCompletedLeaflet(reachDistance);
+		deliverLeaflet.addInput(leafletsMO);
+		deliverLeaflet.addInput(innerSenseMO);
+		deliverLeaflet.addInput(deliverySpotMO);
+		deliverLeaflet.addOutput(handsMO);
+                insertCodelet(deliverLeaflet);
+                registerCodelet(deliverLeaflet,"Behavioral");
+                behavioralCodelets.add(deliverLeaflet);
                 
                 Codelet forage=new Forage();
 		forage.addInput(knownApplesMO);
 		forage.addInput(knownJewelsMO);
 		forage.addInput(innerSenseMO);
+		forage.addInput(leafletsMO);
                 forage.addOutput(legsMO);
                 insertCodelet(forage);
                 registerCodelet(forage,"Behavioral");

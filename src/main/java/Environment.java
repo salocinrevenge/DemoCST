@@ -22,6 +22,7 @@ import ws3dproxy.CommandExecException;
 import ws3dproxy.WS3DProxy;
 import ws3dproxy.model.Creature;
 import ws3dproxy.model.World;
+import ws3dproxy.model.WorldPoint;
 import ws3dproxy.util.Constants;
 import ws3dproxy.util.Logger;
 
@@ -35,6 +36,7 @@ public final class Environment {
     public int port = 4011;
     public String robotID="r0";
     public Creature c = null;
+    public WorldPoint deliverySpot = null;
     
     public Environment() {
           WS3DProxy proxy = new WS3DProxy();
@@ -45,8 +47,12 @@ public final class Environment {
              World.createFood(0, 100, 220);
              World.createFood(0, 250, 210);
              World.createDeliverySpot(500.0, 500.0);
+             deliverySpot = World.getDeliverySpot();
              c = proxy.createCreature(100,450,0,0);
              c.start();
+             for (int i = 0; i < 3; i++) {
+                 c.genLeaflet();
+             }
              grow(w,1);
           } catch (CommandExecException e) {
               

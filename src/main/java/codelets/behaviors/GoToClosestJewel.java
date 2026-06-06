@@ -28,12 +28,16 @@ import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.MemoryContainer;
 import br.unicamp.cst.core.entities.MemoryObject;
 import br.unicamp.cst.representation.idea.Idea;
+import java.util.List;
+import support.LeafletUtils;
+import ws3dproxy.model.Leaflet;
 import ws3dproxy.model.Thing;
 
 public class GoToClosestJewel extends Codelet {
 
 	private Memory closestJewelMO;
 	private Memory selfInfoMO;
+	private Memory leafletsMO;
 	private MemoryContainer legsMO;
 	private int creatureBasicSpeed;
 	private double reachDistance;
@@ -48,6 +52,7 @@ public class GoToClosestJewel extends Codelet {
 	public void accessMemoryObjects() {
 		closestJewelMO=(MemoryObject)this.getInput("CLOSEST_JEWEL");
 		selfInfoMO=(MemoryObject)this.getInput("INNER");
+		leafletsMO=(MemoryObject)this.getInput("LEAFLETS");
 		legsMO=(MemoryContainer)this.getOutput("LEGS");
 	}
 
@@ -60,9 +65,10 @@ public class GoToClosestJewel extends Codelet {
 
                 Thing closestJewel = (Thing) closestJewelMO.getI();
                 Idea cis = (Idea) selfInfoMO.getI();
+                List<Leaflet> leaflets = (List<Leaflet>) leafletsMO.getI();
 				String stateFuel = (String) cis.get("stateFuel").getValue();
 
-		if(closestJewel != null && stateFuel == "jewel")
+		if(closestJewel != null && "jewel".equals(stateFuel) && !LeafletUtils.hasCompletedLeaflet(leaflets))
 		{
 			double jewelX=0;
 			double jewelY=0;
@@ -110,7 +116,7 @@ public class GoToClosestJewel extends Codelet {
 		}
                 else {
                     activation=0.0;
-                    legsMO.setI("",activation,name);
+                    // legsMO.setI("",activation,name);
                 }
                 
 	}//end proc
