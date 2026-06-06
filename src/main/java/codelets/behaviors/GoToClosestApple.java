@@ -72,7 +72,7 @@ public class GoToClosestApple extends Codelet {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-                        
+			
 			double selfX=(double)cis.get("position.x").getValue();
 			double selfY=(double)cis.get("position.y").getValue();
 

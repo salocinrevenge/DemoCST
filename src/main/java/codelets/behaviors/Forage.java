@@ -72,7 +72,6 @@ public class Forage extends Codelet {
                                 && LeafletUtils.hasOpenLeaflet(leaflets)
                                 && !LeafletUtils.hasCompletedLeaflet(leaflets);
 
-			System.out.println("Forage: stateFuel=" + stateFuel + " knownA=" + knownA.size() + " knownJ=" + knownJ.size());
 
 			double activation = 0.0;
 			JSONObject message = new JSONObject();

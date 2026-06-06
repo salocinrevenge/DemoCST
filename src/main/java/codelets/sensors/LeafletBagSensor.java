@@ -42,8 +42,6 @@ public class LeafletBagSensor extends Codelet {
 
             bagMO.setI(bag);
             leafletsMO.setI(leaflets);
-            System.out.println("LeafletBagSensor: leaflets=" + leaflets.size()
-                    + " bagCrystals=" + (bag != null ? bag.getTotalNumberCrystals() : 0));
         } catch (Exception e) {
             e.printStackTrace();
         }

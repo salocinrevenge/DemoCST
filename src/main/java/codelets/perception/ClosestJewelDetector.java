@@ -93,7 +93,6 @@ public class ClosestJewelDetector extends Codelet {
 //                else
 //                   System.out.println("Closest jewel: null"+" known: "+known.size()); 
                 closestJewelMO.setI(closest_jewel);
-				System.out.println("ClosestJewelDetector: closest_jewel="+(closest_jewel!=null?closest_jewel.getName():"null")+" known="+known.size()+" missing="+LeafletUtils.describeMissing(leaflets));
 	}//end proc
 
 @Override

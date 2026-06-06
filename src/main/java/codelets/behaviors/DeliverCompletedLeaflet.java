@@ -66,7 +66,6 @@ public class DeliverCompletedLeaflet extends Codelet {
                 message.put("ACTION", "DELIVER");
                 message.put("LEAFLET_ID", completed.getID().toString());
                 handsMO.setI(message.toString());
-                System.out.println("I sent the comand deliver to deliver the leaflet: " + message.toString());
                 activation = 1.0;
             } catch (JSONException e) {
                 e.printStackTrace();

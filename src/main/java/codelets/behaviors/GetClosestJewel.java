@@ -100,15 +100,12 @@ public class GetClosestJewel extends Codelet {
 			JSONObject message=new JSONObject();
 			try {
 				if(distance<=reachDistance){ //get it		
-					System.out.println("Getting the jewel: distance="+distance + " reachDistance="+reachDistance);				
 					message.put("OBJECT", jewelName);
 					message.put("ACTION", "PICKUP");
 					handsMO.setI(message.toString());
 					activation=1.0;
 					DestroyClosestJewel();
-					System.out.println("I sent the comand pickup to get the jewel: "+message.toString());
 				}else{
-					System.out.println("Too far to get the jewel: distance="+distance + " reachDistance="+reachDistance);
 					handsMO.setI("");	//nothing
                                         activation=0.0;
 				}

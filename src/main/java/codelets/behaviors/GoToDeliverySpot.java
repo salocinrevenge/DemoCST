@@ -53,7 +53,7 @@ public class GoToDeliverySpot extends Codelet {
             // legsMO.setI("", activation, name);
             return;
         }
-
+        
         Idea cis = (Idea) selfInfoMO.getI();
         double selfX = (double) cis.get("position.x").getValue();
         double selfY = (double) cis.get("position.y").getValue();
