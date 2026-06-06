@@ -23,6 +23,8 @@ import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.MemoryContainer;
 import br.unicamp.cst.core.entities.MemoryObject;
+import br.unicamp.cst.representation.idea.Idea;
+
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,8 +39,11 @@ import ws3dproxy.model.Thing;
 
 public class Forage extends Codelet {
     
-        private Memory knownMO;
-        private List<Thing> known;
+        private Memory knownAMO;
+        private Memory knownJMO;
+        private MemoryObject selfInfoMO;
+        private List<Thing> knownA;
+        private List<Thing> knownJ;
         private MemoryContainer legsMO;
 
 
@@ -50,28 +55,37 @@ public class Forage extends Codelet {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void proc() {
-            known = (List<Thing>) knownMO.getI();
-            if (known.size() == 0) {
-		JSONObject message=new JSONObject();
+			Idea cis = (Idea) selfInfoMO.getI();
+            knownA = (List<Thing>) knownAMO.getI();
+            knownJ = (List<Thing>) knownJMO.getI();
+
+			String stateFuel = (String) cis.get("stateFuel").getValue();
+			boolean forageFood = "food".equals(stateFuel) && knownA.isEmpty();
+			boolean forageJewel = "jewel".equals(stateFuel) && knownJ.isEmpty();
+
+			System.out.println("Forage: stateFuel=" + stateFuel + " knownA=" + knownA.size() + " knownJ=" + knownJ.size());
+
+			double activation = 0.0;
+			JSONObject message = new JSONObject();
 			try {
 				message.put("ACTION", "FORAGE");
-                                activation=1.0;
-				legsMO.setI(message.toString(),activation,name);
+				if (forageFood || forageJewel) {
+					activation = 1.0;
+				}
+				legsMO.setI(message.toString(), activation, name);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-            }
-            else activation=0.0;
-            JSONObject message=new JSONObject();
-            message.put("ACTION", "FORAGE");
-            legsMO.setI(message.toString(),activation,name);		
 	}
 
 	@Override
 	public void accessMemoryObjects() {
-            knownMO = (MemoryObject)this.getInput("KNOWN_APPLES");
+            knownAMO = (Memory)this.getInput("KNOWN_APPLES");
+            knownJMO = (Memory)this.getInput("KNOWN_JEWELS");
+            selfInfoMO=(MemoryObject)this.getInput("INNER");
+
             legsMO = (MemoryContainer)this.getOutput("LEGS");
 	}
         

@@ -94,13 +94,15 @@ public class EatClosestApple extends Codelet {
 			double distance = pSelf.distance(pApple);
 			JSONObject message=new JSONObject();
 			try {
-				if(distance<=reachDistance){ //eat it						
+				if(distance<=reachDistance){ //eat it	
+					System.out.println("Eating the apple: distance="+distance + " reachDistance="+reachDistance);					
 					message.put("OBJECT", appleName);
 					message.put("ACTION", "EATIT");
 					handsMO.setI(message.toString());
                                         activation=1.0;
                                         DestroyClosestApple();
 				}else{
+					System.out.println("Too far to eat the apple: distance="+distance + " reachDistance="+reachDistance);
 					handsMO.setI("");	//nothing
                                         activation=0.0;
 				}

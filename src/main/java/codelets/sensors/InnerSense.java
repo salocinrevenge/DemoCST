@@ -56,7 +56,18 @@ public class InnerSense extends Codelet {
              cis.get("position.y").setValue(c.getPosition().getY());
              cis.get("pitch").setValue(c.getPitch());
              cis.get("fuel").setValue(c.getFuel());
-             cis.get("goodFuel").setValue(800.0);
+             double goodFuel = 900.0;
+             double badFuel = 800.0;
+             String stateFuel = cis.get("stateFuel").getValue().toString();
+             cis.get("goodFuel").setValue(goodFuel);
+             cis.get("badFuel").setValue(badFuel);
+             if(c.getFuel() > goodFuel) {
+                 cis.get("stateFuel").setValue("jewel");
+             } else if (c.getFuel() < badFuel) {
+                 cis.get("stateFuel").setValue("food");
+             } else {
+                 cis.get("stateFuel").setValue(stateFuel);
+             }
              Polygon pol = c.getFOV();
              Idea poli = cis.get("FOV");
              poli.get("bounds.x").setValue(pol.getBounds().getX());

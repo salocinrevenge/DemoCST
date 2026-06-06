@@ -47,7 +47,7 @@ public final class Environment {
              World.createDeliverySpot(500.0, 500.0);
              c = proxy.createCreature(100,450,0,0);
              c.start();
-             grow(w,7);
+             grow(w,1);
           } catch (CommandExecException e) {
               
           }

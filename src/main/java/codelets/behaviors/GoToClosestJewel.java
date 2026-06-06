@@ -53,14 +53,16 @@ public class GoToClosestJewel extends Codelet {
 
 	@Override
 	public void proc() {
+				// Find distance between creature and closest jewel
 		// Find distance between creature and closest jewel
 		//If far, go towards it
 		//If close, stops
 
                 Thing closestJewel = (Thing) closestJewelMO.getI();
                 Idea cis = (Idea) selfInfoMO.getI();
+				String stateFuel = (String) cis.get("stateFuel").getValue();
 
-		if(closestJewel != null)
+		if(closestJewel != null && stateFuel == "jewel")
 		{
 			double jewelX=0;
 			double jewelY=0;
@@ -75,8 +77,6 @@ public class GoToClosestJewel extends Codelet {
 			double selfX=(double)cis.get("position.x").getValue();
 			double selfY=(double)cis.get("position.y").getValue();
 
-			double fuel = (double)cis.get("fuel").getValue();
-			double goodFuel = (double)cis.get("goodFuel").getValue();
 
 			Point2D pJewel = new Point();
 			pJewel.setLocation(jewelX, jewelY);
@@ -88,8 +88,6 @@ public class GoToClosestJewel extends Codelet {
 			//JSONObject message=new JSONObject();
                         Idea message = Idea.createIdea("message","", Idea.guessType("Property",null,1.0,0.5));
 			try {
-				if(fuel>=goodFuel)
-				{
 					if(distance>reachDistance){ //Go to it
 											message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
 											message.add(Idea.createIdea("X",(int)jewelX, Idea.guessType("Property",null,1.0,0.5)));
@@ -106,7 +104,6 @@ public class GoToClosestJewel extends Codelet {
 					}
 
 					legsMO.setI(toJson(message),activation,name);
-				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}	

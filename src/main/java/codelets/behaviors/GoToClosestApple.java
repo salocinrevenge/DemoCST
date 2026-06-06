@@ -59,8 +59,9 @@ public class GoToClosestApple extends Codelet {
 
                 Thing closestApple = (Thing) closestAppleMO.getI();
                 Idea cis = (Idea) selfInfoMO.getI();
+				String stateFuel = (String) cis.get("stateFuel").getValue();
 
-		if(closestApple != null)
+		if(closestApple != null && stateFuel == "food")
 		{
 			double appleX=0;
 			double appleY=0;
@@ -75,8 +76,6 @@ public class GoToClosestApple extends Codelet {
 			double selfX=(double)cis.get("position.x").getValue();
 			double selfY=(double)cis.get("position.y").getValue();
 
-			double fuel = (double) cis.get("fuel").getValue();
-			double goodFuel = (double) cis.get("goodFuel").getValue();
 
 			Point2D pApple = new Point();
 			pApple.setLocation(appleX, appleY);
@@ -88,8 +87,6 @@ public class GoToClosestApple extends Codelet {
 			//JSONObject message=new JSONObject();
                         Idea message = Idea.createIdea("message","", Idea.guessType("Property",null,1.0,0.5));
 			try {
-				if(fuel<goodFuel)
-				{
 					if(distance>reachDistance){ //Go to it
 											message.add(Idea.createIdea("ACTION","GOTO", Idea.guessType("Property",null,1.0,0.5)));
 											message.add(Idea.createIdea("X",(int)appleX, Idea.guessType("Property",null,1.0,0.5)));
@@ -106,7 +103,6 @@ public class GoToClosestApple extends Codelet {
 					}
 					legsMO.setI(toJson(message),activation,name);
 
-				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}	

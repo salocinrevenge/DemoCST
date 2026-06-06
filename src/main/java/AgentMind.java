@@ -84,6 +84,8 @@ public class AgentMind extends Mind {
                 cis.add(Idea.createIdea("cis.pitch", 0D, Idea.guessType("Property", null,1.0,0.5)));
                 cis.add(Idea.createIdea("cis.fuel", 0D, Idea.guessType("Property", null,1.0,0.5)));
                 cis.add(Idea.createIdea("cis.goodFuel", 0D, Idea.guessType("Property", null,1.0,0.5)));
+                cis.add(Idea.createIdea("cis.badFuel", 0D, Idea.guessType("Property", null,1.0,0.5)));
+                cis.add(Idea.createIdea("cis.stateFuel", "jewel", Idea.guessType("Property", null,1.0,0.5)));
                 Idea position = Idea.createIdea("cis.position","", Idea.guessType("Property",null,1.0,0.5));
                 position.add(Idea.createIdea("cis.position.x",0D,Idea.guessType("QualityDimension",null,1.0,0.5)));
                 position.add(Idea.createIdea("cis.position.y",0D,Idea.guessType("QualityDimension",null,1.0,0.5)));
@@ -201,6 +203,8 @@ public class AgentMind extends Mind {
                 
                 Codelet forage=new Forage();
 		forage.addInput(knownApplesMO);
+		forage.addInput(knownJewelsMO);
+		forage.addInput(innerSenseMO);
                 forage.addOutput(legsMO);
                 insertCodelet(forage);
                 registerCodelet(forage,"Behavioral");
